@@ -4,7 +4,10 @@ import java.nio.ByteBuffer
 
 import java.io.FileOutputStream
 import scala.util.Using
-
+/**
+  type classes are often considered a more flexible and composable alternative to
+  traditional inheritance for designing polymorphic behavior.
+ */
 trait Channel {
   def write(obj: Any): Unit
 }
