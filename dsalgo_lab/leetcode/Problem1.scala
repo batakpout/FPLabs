@@ -2,7 +2,7 @@ package dsalgo_lab.leetcode
 
 import scala.collection.immutable.HashMap
 import scala.collection.mutable
-
+//TWO SUM
 /**
  * 1. Naive solution to use two loops and check for target
  * Time Complexity: O(N2), Finding pair for every element in the array of size N.
