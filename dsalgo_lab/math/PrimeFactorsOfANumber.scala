@@ -2,6 +2,7 @@ package dsalgo_lab.math
 
 object PrimeFactorsOfANumber extends App {
 
+ //prime factors of 24: 2,2,2,3 , prime factors of 23 , 23
 
   def primeFactors(n: Int): List[Int] = {
 
