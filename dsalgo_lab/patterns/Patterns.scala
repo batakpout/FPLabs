@@ -134,3 +134,45 @@ object Patterns5 extends App {
   }
   printPatterns(10)
 }
+
+/**
+   * * *  * * *
+   * *      * *
+   *          *
+   * *      * *
+   * * *  * * *
+ */
+
+object Patterns6 extends App {
+
+  def printPatterns(n: Int): Unit = {
+    var sp = 1
+    var st = n / 2 + 1
+    for (i <- 1 to n) {
+
+      for (_ <- 1 to st) {
+        print("*\t")
+      }
+
+      for(_ <- 1 to sp) {
+        print("\t")
+      }
+
+      for (_ <- 1 to st) {
+        print("*\t")
+      }
+
+      if(i <= n/2) {
+        sp += 2
+        st -= 1
+      } else {
+        sp -= 2
+        st +=1
+      }
+
+      println()
+
+    }
+  }
+  printPatterns(10)
+}
