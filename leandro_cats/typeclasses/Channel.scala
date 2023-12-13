@@ -4,6 +4,7 @@ import java.nio.ByteBuffer
 
 import java.io.FileOutputStream
 import scala.util.Using
+
 /**
   type classes are often considered a more flexible and composable alternative to
   traditional inheritance for designing polymorphic behavior.
@@ -40,9 +41,9 @@ object TestFileChannel extends App {
 /**
  * This approach above has pros and cons
  * Pros: Very Simple Interface
- * Cons: unhandled types --> throw exception and two responsibilities (1. Getting Bytes, 2. Writing Bytes)
+ * Cons: Unhandled types --> throw exception and two responsibilities (1. Getting Bytes, 2. Writing Bytes)
    ideally we should have only one responsibility, we should care about one thing only
-   How can we improve? Inheritance to the rescue
+   How can we improve? Inheritance to the rescue.
  */
 
 trait ByteEncodable {
@@ -54,9 +55,9 @@ trait Channel2 {
 }
 
 object FileChannel2 extends Channel2 {
-  override def write(obj: ByteEncodable): Unit = {
+  override def write(be: ByteEncodable): Unit = {
     Using(new FileOutputStream("/Users/awani/code_personal/FPlabs/files")) { os =>
-      os.write(obj.encode())
+      os.write(be.encode())
       os.flush()
     }
   }
@@ -124,5 +125,12 @@ object FileChannel3Test extends App {
   Advantages of using type classes:
   - can be instantiated by any type (custom, Int etc)
   - cleaner interface [no extending classes, we inject instances from the outside], so type remains the same
-  - several implementations possible for the same type 
+  - several implementations possible for the same type
  */
+
+/**
+Type classes offer a more modular and extensible way to achieve polymorphism compared to traditional inheritance.
+They enable ad-hoc polymorphism, allowing you to define new behaviors for existing types without modifying their code.
+This can lead to more maintainable and scalable design
+ */
+
