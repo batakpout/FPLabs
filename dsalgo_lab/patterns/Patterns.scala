@@ -294,3 +294,98 @@ object Pattern10 extends App {
 
   printPatterns(5)
 }
+
+/**
+  1
+  1 2
+  1 2 3
+  1 2 3 4
+  1 2 3 4 5
+ */
+
+object Pattern11 extends App {
+    def printPattern(n: Int): Unit = {
+      for (i <- 1 to n) {
+        for (j <- 1 to i) {
+          print(s"$j\t")
+        }
+        println()
+      }
+    }
+
+    printPattern(10)
+
+}
+
+/**
+  0
+  1 1
+  2 3 5
+  8 13 21 34
+ */
+
+object Pattern12 extends App {
+
+  def printPattern(n: Int): Unit = {
+    var curr = 0
+    var next = 1
+    for (i <- 1 to n) {
+      for (j <- 1 to i) {
+        print(s"$curr\t")
+        val r = curr + next
+        curr = next
+        next = r
+      }
+      println()
+    }
+  }
+
+  printPattern(5)
+
+}
+
+/**
+  1
+  1 1
+  1 2 1
+  1 3 3 1
+  1 4 6 4 1
+ */
+//todo: solve using DP
+object Pattern13 extends App {
+
+  /**
+     C(i, j + 1) = C(i, j) * (i - j) / j + 1
+   */
+
+  def pascalTriangle(n: Int) = {
+    for (i <- 0 until n) {
+      var iCj = 1
+      for (j <- 0 to i) {
+        print(s"$iCj\t")
+        iCj = (iCj * (i - j)) / (j + 1)
+      }
+      println()
+    }
+  }
+
+  pascalTriangle(10)
+}
+
+/**
+  multiplication table:
+  5 * 1 = 5
+  5 * 2 = 10
+  ...........
+ */
+object Pattern14 extends App {
+
+  def mulTable(n: Int) = {
+    for (i <- 1 to 10) {
+      val res = n * 1
+      print(s"$n * $i = $res")
+      println()
+    }
+  }
+  mulTable(5)
+}
