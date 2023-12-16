@@ -330,7 +330,7 @@ object Pattern12 extends App {
     var curr = 0
     var next = 1
     for (i <- 1 to n) {
-      for (j <- 1 to i) {
+      for (_ <- 1 to i) {
         print(s"$curr\t")
         val r = curr + next
         curr = next
@@ -388,4 +388,154 @@ object Pattern14 extends App {
     }
   }
   mulTable(5)
+}
+
+/**
+  bit difficult than others
+         1
+      2  3  2
+   3  4  5  4  3
+      2  3  2
+         1
+ */
+
+object Pattern15 extends App {
+
+  def printPattern(n: Int):Unit = {
+    var st = 1
+    var sp = n / 2
+    var r = 1
+    for(i <- 1 to n) {
+
+       for(_<- 1 to sp) {
+         print("\t")
+       }
+
+      var c = r
+       for(j <- 1 to st) {
+        print(c + "\t")
+
+         if(j <= st/2) c+=1 else c -=1
+      }
+
+      if(i <= n/ 2) {
+        sp -= 1
+        st += 2
+        r += 1
+      } else {
+        sp += 1
+        st -= 2
+        r -= 1
+      }
+      println()
+    }
+  }
+  printPattern(5)
+}
+
+/**
+  1          1
+  1 2      2 1
+  1 2 3   3 2 1
+  1 2 3 4 3 2 1
+ */
+object Pattern16 extends App {
+
+  def printPattern(n: Int): Unit = {
+    var sp = 2 * n - 3
+    var st = 1
+    for(i <- 1 to n) {
+
+      var r = 1
+      for(_<- 1 to st) {
+        print(r + "\t")
+        r += 1
+      }
+
+      for(_ <- 1 to sp) {
+        print("\t")
+      }
+
+      if(i == n) {
+        st -= 1
+        r -= 1
+      }
+
+      r -= 1
+      for (_ <- 1 to st) {
+        print(r + "\t")
+        r -= 1
+      }
+
+      sp -= 2
+      st += 1
+      println()
+
+    }
+  }
+  printPattern(5)
+}
+
+/**
+          *
+          * *
+      * * * * *
+          * *
+          *
+ */
+object Pattern17 extends App {
+
+    def printPattern(n: Int): Unit = {
+
+      var sp = n / 2
+      var st = 1
+
+      for (i <- 1 to n) {
+
+        for (_ <- 1 to sp) {
+          if (i == n / 2 + 1)
+            print("*\t")
+          else print("\t")
+        }
+
+        for (_ <- 1 to st) {
+          print("*\t")
+        }
+        if (i <= n / 2) st += 1 else st -= 1
+        println()
+      }
+    }
+
+    printPattern(5) // odd input
+
+}
+
+object Pattern18 extends App {
+
+  def printPattern(n: Int): Unit = {
+     var sp = 0
+     var st = n
+    for(i <- 1 to n) {
+
+       for(_ <- 1 to sp) {
+         print("\t")
+       }
+
+      for(j <- 1 to st) {
+         if(i > 1 && i <= n/2 && j > 1 && j < st)
+           print("\t")
+         else print("*\t")
+      }
+
+      if(i <= n/2) {
+        sp += 1
+        st -= 2
+      } else {
+        sp -=1
+        st += 2
+      }
+      println()
+    }
+  }
+  printPattern(7)
 }
