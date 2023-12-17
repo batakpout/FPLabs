@@ -606,5 +606,5 @@ object Pattern20 extends App {
       }
    }
   printPattern(9)
-  
+
 }
