@@ -382,8 +382,7 @@ object Pattern14 extends App {
 
   def mulTable(n: Int) = {
     for (i <- 1 to 10) {
-      val res = n * 1
-      print(s"$n * $i = $res")
+      print(s"$n * $i = ${n * i}")
       println()
     }
   }
@@ -433,7 +432,7 @@ object Pattern15 extends App {
   printPattern(5)
 }
 
-/**
+/** bit difficult than others
   1          1
   1 2      2 1
   1 2 3   3 2 1
@@ -510,6 +509,15 @@ object Pattern17 extends App {
 
 }
 
+/**
+   * * * * * * *
+     *       *
+       *   *
+         *
+       * * *
+    *  * *  * *
+  * *  * *  *  * *
+ */
 object Pattern18 extends App {
 
   def printPattern(n: Int): Unit = {
@@ -538,4 +546,65 @@ object Pattern18 extends App {
     }
   }
   printPattern(7)
+}
+
+
+/**
+     * * *   *
+         *   *
+     * * * * *
+     *   *
+     *   * * *
+ */
+
+object Pattern19 extends App {
+
+  def printPattern(n: Int): Unit = {
+
+    for(i <- 1 to n) {
+      for(j <- 1 to n) {
+
+         if(i == 1) {
+           if(j <= n/2 + 1 || j == n) print("*\t") else print("\t")
+         } else if(i <= n/2) {
+           if(j == n/2 + 1 || j == n) print("*\t") else print("\t")
+         } else if(i == n/2 + 1) {
+           print("*\t")
+         } else if(i < n) {
+           if(j == 1 || j == n/2 + 1) print("*\t") else print("\t")
+         } else {
+           if(j == 1 || j >= n/2 + 1) print("*\t") else print("\t")
+         }
+      }
+      println()
+    }
+  }
+  printPattern(5)
+}
+
+/**
+
+  *         *
+  *         *
+  *    *    *
+  *  *   *  *
+  *         *
+
+ */
+object Pattern20 extends App {
+
+   def printPattern(n: Int): Unit = {
+      for(i <- 1 to n) {
+        for(j <- 1 to n) {
+          if(j == 1 || j == n) print("*\t")
+          else {
+            if(i > n/2 && (i == j || i + j == n + 1)) print("*\t")
+            else print("\t")
+          }
+        }
+        println()
+      }
+   }
+  printPattern(9)
+  
 }
