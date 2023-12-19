@@ -29,8 +29,7 @@ object JsonWriterInstances {
     "name" -> JsString(p.name),
     "email" -> JsString(p.email)
   )))
-  implicit val intWriter = instance[Int](i => JsNumber(i))
-
+  implicit val doubleWriter = instance[Double](i => JsNumber(i))
   /*implicit val stringWriter = new JsonWriter[String] {
     override def write(value: String): Json = JsString(value)
   }
