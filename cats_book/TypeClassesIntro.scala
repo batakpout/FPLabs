@@ -1,3 +1,5 @@
+package cats_book
+
 // simple JSON AST
 sealed trait Json
 
@@ -19,7 +21,17 @@ case class Person(name: String, email: String)
 
 //implicit values
 object JsonWriterInstances {
-  implicit val stringWriter = new JsonWriter[String] {
+
+  def instance[A](f: A => Json): JsonWriter[A] = (value: A) => f(value)
+
+  implicit val stringWriter = instance[String](s => JsString(s))
+  implicit val personWriter = instance[Person](p => JsObject(Map(
+    "name" -> JsString(p.name),
+    "email" -> JsString(p.email)
+  )))
+  implicit val intWriter = instance[Int](i => JsNumber(i))
+
+  /*implicit val stringWriter = new JsonWriter[String] {
     override def write(value: String): Json = JsString(value)
   }
 
@@ -32,7 +44,7 @@ object JsonWriterInstances {
       "name" -> JsString(value.name),
       "email" -> JsString(value.email)
     ))
-  }
+  }*/
 }
 
 //Interface object
@@ -88,6 +100,7 @@ object TestJson2 extends App {
    */
 
   import JsonWriterInstances._
+
   println(Json.toJson(Option(10.2)))
 }
 
