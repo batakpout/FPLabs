@@ -11,7 +11,7 @@
  */
 object BarChat extends App {
 
-  //TC: O(N) for finding max + O(N^2) for building chart
+  //TC: O(N) for finding max + O(N^max) for building chart
 
   def buildBarChat(arr: Array[Int]): Unit = {
     def findMax(arr: Array[Int], index: Int, max: Int): Int = {
