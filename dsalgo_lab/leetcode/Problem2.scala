@@ -1,5 +1,7 @@
 package dsalgo_lab.leetcode
 //ADD TWO NUMBERS USING LINKED LIST
+//Difficulty: Medium
+//Time: O(N), Space: O(1)
 object Problem2 extends App {
 
 
