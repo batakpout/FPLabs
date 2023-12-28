@@ -1,5 +1,7 @@
 package dsalgo_lab.leetcode
-
+// Difficulty: Medium
+//LRU cache
+//The functions get and put must each run in O(1) average time complexity.
 object Problem146 extends App {
 
     class LRUCache(capacity: Int) {
