@@ -1,11 +1,12 @@
 package dsalgo_lab.math
 
 object NewtonSquareRoot extends App {
-  /**
+   /**
    * The classical way to achieve this is by successive approximations using Newton’s method
    * x(n) = x - f(x)/f(x')
    * e.g x = squareroot(N) -> x * x - n = 0
-   * x(n) = x-(x*x-n) / 2x ==> x + n/x ==> nextGuess = (guess + N / guess) / 2
+   * x(n) = x-(x*x-n) / 2x ==> 2x^2 - x^2 + N / 2x => x^2 + n / 2x => x + n/x / 2
+   * x + n/x ==> nextGuess = (guess + N / guess) / 2
    */
   def abs(x: Double): Double = if (x < 0) -x else x
 
