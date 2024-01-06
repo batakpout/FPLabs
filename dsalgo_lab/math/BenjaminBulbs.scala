@@ -14,3 +14,10 @@ object BenjaminBulbs extends App {
 
   println(checkOnBulbsAfterNFluctuations(40).reverse)
 }
+
+/**
+  A perfect square has odd number of factors:
+  e.g 9 = 1, 3, 4
+  e.g 36 = 1,2,3,4,6,9,36
+  So if we have odd number of factors then that bulb will be on
+ */
