@@ -34,7 +34,7 @@ object DifferenceOfTwoArrays extends App {
 
     var idx = 0
     breakable {
-      while (idx < a3.length) {
+      while (idx < a3.length) { //// e.g 1000 - 1 = 0999
         if (a3(idx) == 0) idx += 1
         else break
       }
