@@ -441,7 +441,8 @@ object Pattern15 extends App {
 object Pattern16 extends App {
 
   def printPattern(n: Int): Unit = {
-    var sp = 2 * n - 3
+        var sp = 2 * n - 3 // for n = 4, spaces at start = 5
+
     var st = 1
     for(i <- 1 to n) {
 
