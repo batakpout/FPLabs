@@ -8,8 +8,8 @@ object BinarySearchImperative extends App {
        if(start <= end) {
          val mid = start + ((end - start) / 2)
          if(arr(mid) == target) mid
-         else if(arr(mid) > target) rec(start, end - 1)
-         else rec(start + 1, end)
+         else if(arr(mid) > target) rec(start, mid - 1)
+         else rec(mid + 1, end)
        } else -1
      }
     rec()
