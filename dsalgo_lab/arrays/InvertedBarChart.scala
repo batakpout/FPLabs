@@ -23,4 +23,13 @@ object InvertedBarChart extends App {
   }
 
   solution(Array(3,1,0,5,7))
+  /**
+  *	*		*	*	
+  *			*	*	
+  *			*	*	
+			  *	*	
+			  *	*	
+				  *	
+				  *	
+  */
 }
