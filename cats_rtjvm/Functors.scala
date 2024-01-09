@@ -1,3 +1,4 @@
+package cats_rtjvm
 import scala.util.Try
 
 object Functors {
