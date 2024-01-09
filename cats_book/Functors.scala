@@ -97,3 +97,25 @@ object CatsFunctor extends App {
   }
 
 }
+
+object BinaryTreeFunctor extends App {
+    sealed trait Tree[+A]
+    final case class Branch[A](valeleft: Tree[A], right: Tree[A]) extends Tree[A]
+    final case class Leaf[A](value: A) extends Tree[A]
+
+    implicit val treeFunctor: Functor[Tree] = new Functor[Tree] {
+      override def map[A, B](fa: Tree[A])(f: A => B): Tree[B] = fa match {
+        case Leaf(v) => Leaf(f(v))
+        case Branch(l, r) => Branch(map(l)(f), map(r)(f))
+      }
+    }
+
+  val tree1: Tree[Int] = Branch(Branch(Leaf(33), Leaf(11)), Branch(Leaf(22), Leaf(6)))
+  //todo://val tree1: Branch[Int] = Branch(Branch(Leaf(33), Leaf(11)), Branch(Leaf(22), Leaf(6))) CTE, check in Chapter 1 of invariance issue later
+  import cats.syntax.functor._
+  val tree2 = tree1.map(_ + 2)
+
+  println(tree1)
+  println(tree2)
+}
+
