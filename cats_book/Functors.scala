@@ -8,7 +8,7 @@ trait Functor[F[_]] {
 
   def m[A, B](f: A) = 10//(g: A => B)= ???
 
-  def r[A](a: A) = m(_)
+  def r[A](a: A):A => Int = m(_)
 }
 */
 
