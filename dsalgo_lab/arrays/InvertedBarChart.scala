@@ -10,26 +10,20 @@ object InvertedBarChart extends App {
       } else max
     }
 
-    val max = findMax()
-    var i = 1
-    while(i > 0 && i <= max) {
-      a.foreach { item =>
-         if(item >= i) print("*\t")
-         else print("\t")
+    def printStars(i: Int, max: Int): Unit = {
+      if (i > 0 && i <= max) {
+        a.foreach { item =>
+          if (item >= i) print("*\t")
+          else print("\t")
+        }
+        println()
+        printStars(i + 1, max)
       }
-      println()
-      i += 1
     }
+
+    val max = findMax()
+    printStars(1, max)
   }
 
   solution(Array(3,1,0,5,7))
-  /**
-  *	*		*	*	
-  *			*	*	
-  *			*	*	
-			  *	*	
-			  *	*	
-				  *	
-				  *	
-  */
 }
