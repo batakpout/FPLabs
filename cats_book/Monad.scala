@@ -105,7 +105,7 @@ object CatsSyntax extends App {
      a.flatMap(x=> b.map( y => x * x  + y * y))
   import cats.instances.list._
   import cats.instances.option._
-  //todo : think about tranformation oriternation here?
+  //todo : think about tranformation or iternation here?
    println(sumSquare(List(1,2), List(3,4)))
    println(sumSquare(Option(1), Option(2)))
 
