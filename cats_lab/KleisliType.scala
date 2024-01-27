@@ -43,6 +43,7 @@ object KelisliType1 extends App {
   val x1 = reciprocalKleisli(2)
   println(x1)
   val parseAndReciprocalKleisli: Kleisli[Option, String, Double] = parseKleisli andThen reciprocalKleisli
-  val x2 = parseAndReciprocalKleisli("4")
+  val x2: Option[Double] = parseAndReciprocalKleisli("4")
+  val x3: String => Option[Double] = parseAndReciprocalKleisli.run
   println(x2)
 }
