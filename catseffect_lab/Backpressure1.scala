@@ -1,3 +1,11 @@
+/**
+Backpressure allows running effects through the rate-limiting strategy.
+Backpressure can be utilized in a scenario where a 
+large number of tasks need to be processed, but only a certain number of
+resources are available. In other words, backpressure is needed
+when there is not enough time or resources available for processing 
+all the requests on your system.
+**/
 object BackpressureExample extends IOApp {
 
   def processElement(value: Int): IO[Unit] =
@@ -15,6 +23,10 @@ object BackpressureExample extends IOApp {
       fiber4 <- backpressure.metered(IO.sleep(1.second) *> processElement(8)).start
 
       // Wait for the tasks to complete
+      /**
+      While fiber1 is processing, if another element arrives (e.g., fiber2), it is placed in the backpressure buffer since the buffer size is limited to 1.
+      The backpressure system allows only one element to be processed at a time, preventing the buffer from overflowing.
+      */
       _ <- fiber1.join
       _ <- fiber2.join
       _ <- fiber3.join
