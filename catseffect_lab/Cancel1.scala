@@ -1,15 +1,37 @@
 package catseffect.cancellation
 
-import cats.effect.{IO, IOApp}
+import cats.effect.{ExitCode, IO, IOApp}
 import cats.syntax.all._
 
 import scala.concurrent.duration.DurationInt
+
+object CancelProgram extends IOApp {
+
+  import catseffect.debug._
+
+  //val chainOfIOs = IO("waiting").debug  >> IO(42) >>= IO.println
+  //val chainOfIOsWithCancel = IO("waiting").debug >> IO.canceled >> IO(42) >>= IO.println
+
+  val specialPaymentSys: IO[Unit] = (IO("Payment running").flatMap(IO.println) >>
+    IO.sleep(1.second) >>
+    IO("payment completed").flatMap(IO.println)).onCancel(IO("Mega cancel of doom").flatMap(IO.println).void)
+
+  val cancellationOfDoom = for {
+    fib <- specialPaymentSys.start
+    _ <- IO.sleep(1000.millis) >> fib.cancel
+    _ <- fib.join
+  } yield ()
+
+
+  override def run(args: List[String]): IO[ExitCode] = cancellationOfDoom.as(ExitCode.Success)
+
+}
 
 object CancelProgram1 extends IOApp.Simple {
 
   import catseffect.debug._
 
-  val chainOfIOs = IO("waiting").debug  >> IO(42) >>= IO.println
+  val chainOfIOs = IO("waiting").debug >> IO(42) >>= IO.println
   val chainOfIOsWithCancel = IO("waiting").debug >> IO.canceled >> IO(42) >>= IO.println
 
   val specialPaymentSys: IO[Unit] = (IO("Payment running").flatMap(IO.println) >>
@@ -18,8 +40,8 @@ object CancelProgram1 extends IOApp.Simple {
 
   val cancellationOfDoom = for {
     fib <- specialPaymentSys.start
-    _<- IO.sleep(1000.millis) >> fib.cancel
-    _<- fib.join
+    _ <- IO.sleep(1000.millis) >> fib.cancel
+    _ <- fib.join
   } yield ()
 
   val atomicPayment: IO[Unit] = IO.uncancelable(_ => specialPaymentSys) // masking
@@ -31,6 +53,7 @@ object CancelProgram1 extends IOApp.Simple {
   } yield ()
 
   import print._
+
   val inputPass: IO[String] = IO("Input passwd").print >> IO("Typing passwd").print >>
     IO.sleep(2.second) >> IO("MyPassw0rd!").print
   val verifyPass: String => IO[Boolean] = (pw: String) => IO("Verifying...").print >> IO.sleep(4.second) >> IO(pw == "MyPassw0rd!").print
