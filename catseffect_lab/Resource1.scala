@@ -1,5 +1,10 @@
 import cats.effect.Resource
-
+/**
+*  Resource[IO, A] describes the ability to initialize and release a resource.
+* similar to trycatch but composable and referentially transparent.
+ * Allows guarenteed finalizations (Whether the f given completes, fails or cancelled)
+ the resource is closed, will not leak
+*/
 import java.io.{FileInputStream, FileOutputStream}
 
 object ResourceExample extends App {
