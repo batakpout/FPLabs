@@ -1,7 +1,7 @@
 package temp
 
 import cats.effect.unsafe.IORuntime
-import cats.effect.{ExitCode, IO, IOApp}
+import cats.effect.{ExitCode, IO, IOApp, Resource}
 import eu.timepit.refined.types.all.NonNegLong
 
 object MyApp extends IOApp {
@@ -180,6 +180,70 @@ object IOError extends App {
   val aFailure: IO[Int] = IO.raiseError(new RuntimeException("a proper fail"))
   val effectAsEither: IO[Either[Throwable, Int]] = aFailure.attempt
 }
+import cats.effect.{IO, IOApp}
+import fs2.Stream
+import fs2.io.file.{Files, Path}
+
+object ResourceExample extends IOApp.Simple {
+
+  // Define a simple resource that acquires and releases a file handle
+  def fileResource(path: Path): Resource[IO, Unit] =
+    Resource.make(IO(println(s"Acquiring file handle for $path")))(_ => IO(println(s"Releasing file handle for $path")))
+
+  // Define a simple resource that acquires and releases a network connection
+  def networkResource(host: String, port: Int): Resource[IO, Unit] =
+    Resource.make(IO(println(s"Opening connection to $host:$port")))(_ => IO(println(s"Closing connection to $host:$port")))
+
+  override def run: IO[Unit] = {
+    val filePath = Path("example.txt")
+    val host = "localhost"
+    val port = 8080
+
+    val program = for {
+      // Acquire and use the file resource
+      _ <- fileResource(filePath).use { _ =>
+        IO(println("File resource in use"))
+      }
+      // Acquire and use the network resource
+      _ <- networkResource(host, port).use { _ =>
+        IO(println("Network resource in use"))
+      }
+    } yield ()
+
+    program.as(ExitCode.Success)
+  }
+}
+
+import cats.effect.IOApp
+import cats.effect.IO
+import cats.effect.kernel.Outcome
+import scala.concurrent.duration._
+object StupidFizzBuzz {
+  val runIO: IO[Unit] =
+    for {
+      ctr <- IO.ref(0)
+
+      wait = IO.sleep(1.second)
+      poll = wait *> ctr.get
+
+      _ <- poll.flatMap(IO.println(_)).foreverM.start
+      _ <- poll.map(_ % 3 == 0).ifM(IO.println("fizz"), IO.unit).foreverM.start
+      _ <- poll.map(_ % 5 == 0).ifM(IO.println("buzz"), IO.unit).foreverM.start
+
+      _ <- (wait *> ctr.update(_ + 1)).foreverM.void
+    } yield ()
+}
+
+object Main extends IOApp.Simple {
+
+  def run: IO[Unit] =
+    StupidFizzBuzz.runIO.guaranteeCase {
+      case Outcome.Succeeded(fa) => fa
+      case Outcome.Canceled() => IO.println("I was cancelled!")
+      case Outcome.Errored(_) => IO.println("I errored!")
+    }
+}
+
 
 
 
