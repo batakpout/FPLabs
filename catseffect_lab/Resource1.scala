@@ -92,3 +92,33 @@ object Example1 extends IOApp.Simple {
     }
   }
 }
+
+object ResourceExample extends IOApp.Simple {
+
+  // Define a simple resource that acquires and releases a file handle
+  def fileResource(path: Path): Resource[IO, Unit] =
+    Resource.make(IO(println(s"Acquiring file handle for $path")))(_ => IO(println(s"Releasing file handle for $path")))
+
+  // Define a simple resource that acquires and releases a network connection
+  def networkResource(host: String, port: Int): Resource[IO, Unit] =
+    Resource.make(IO(println(s"Opening connection to $host:$port")))(_ => IO(println(s"Closing connection to $host:$port")))
+
+  override def run: IO[Unit] = {
+    val filePath = Path("example.txt")
+    val host = "localhost"
+    val port = 8080
+
+    val program = for {
+      // Acquire and use the file resource
+      _ <- fileResource(filePath).use { _ =>
+        IO(println("File resource in use"))
+      }
+      // Acquire and use the network resource
+      _ <- networkResource(host, port).use { _ =>
+        IO(println("Network resource in use"))
+      }
+    } yield ()
+
+    program.as(ExitCode.Success)
+  }
+}
