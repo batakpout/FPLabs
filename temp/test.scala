@@ -2,6 +2,7 @@ package temp
 
 import cats.effect.unsafe.IORuntime
 import cats.effect.{ExitCode, IO, IOApp}
+import eu.timepit.refined.types.all.NonNegLong
 
 object MyApp extends IOApp {
 
@@ -109,49 +110,9 @@ object FutureParallelTestDef extends App {
 
 import cats.implicits._
 
-object IOComposition extends App {
-
-  /**
-   * IO doesn’t provide any support for the effect of parallelism! And this is by design,
-   * because we want different effects to have different types, as per our Effect Pattern
-   */
-  implicit val runtime: IORuntime = cats.effect.unsafe.IORuntime.global
-
-  val hello = IO(println(s"[${Thread.currentThread.getName}] Hello"))
-  val world = IO(println(s"[${Thread.currentThread.getName}] World"))
-  val hw1: IO[Unit] = for {
-    _ <- hello
-    _ <- world
-  } yield ()
-
-  val hw2: IO[Unit] =
-    (hello, world).parMapN((_, _) => ())
-
-  hw1.unsafeRunSync()
-  println("====")
-  hw2.unsafeRunSync()
-
-  Thread.sleep(5000)
-  //unlike Future, IO itself doesn’t provide any support for parallelism.
-  //So how can we achieve it?
-}
 
 //execute two IOs in parallel
 
-object ParallelIOTutorial extends IOApp {
-
-  val io1: IO[Unit] = IO(println("Executing IO 1"))
-  val io2: IO[Unit] = IO(println("Executing IO 2"))
-
-  override def run(args: List[String]): IO[ExitCode] = {
-    val parallelIO: IO[Unit] = (io1, io2).parTupled.flatMap {
-      case (_, _) =>
-        IO(println("Both IOs completed"))
-    }
-
-    parallelIO.as(ExitCode.Success)
-  }
-}
 
 object TestFuture extends App {
 
@@ -214,89 +175,11 @@ object WithIO extends App {
   Thread.sleep(5000)
 }
 
-object TraverseIO extends IOApp {
-
-  override def run(args: List[String]): IO[ExitCode] = {
-
-    val ioList: List[IO[Int]] = List(
-      IO(1),
-      IO(2),
-      IO(3)
-    )
-    import cats.syntax.all._
-    val modifiedIOList: IO[List[Int]] = ioList.traverse(io => io.map(_ + 10))
-    modifiedIOList.flatMap(v => IO.println(v)).as(ExitCode.Success)
-
-  }
-
-}
-
-object TraverseOptionList extends App {
-
-  import cats.implicits._
-
-
-  val optionList: List[Option[Int]] = List(Some(1), Some(2), Some(3))
-
-  val modifiedOptionList: Option[List[Int]] = optionList.traverse(opt => opt.map(_ + 10))
-
-  modifiedOptionList.foreach(result => println(s"Modified Option List: $result"))
-
-}
 
 object IOError extends App {
   val aFailure: IO[Int] = IO.raiseError(new RuntimeException("a proper fail"))
   val effectAsEither: IO[Either[Throwable, Int]] = aFailure.attempt
-
 }
 
-import cats.effect.Resource
-
-import java.io.{FileInputStream, FileOutputStream}
-
-object ResourceExample extends App {
-
-  // Dummy class representing the content of a file
-  case class FileContent(content: String)
-
-  // Function to open a file
-  def openFile(name: String): Resource[IO, FileInputStream] =
-    Resource.make(IO(new FileInputStream(name)))(stream => IO(stream.close()).handleErrorWith(_ => IO.unit))
-
-  // Function to close a file
-  def close(file: FileInputStream): IO[Unit] =
-    IO(file.close()).handleErrorWith(_ => IO.unit)
-
-  // Function to read from a file
-  def read(file: FileInputStream): IO[FileContent] =
-    IO {
-      val byteArray = new Array[Byte](file.available())
-      file.read(byteArray)
-      FileContent(new String(byteArray))
-    }.handleErrorWith(_ => IO(FileContent("")))
-
-  // Function to write to a file
-  def write(file: FileOutputStream, content: String): IO[Unit] =
-    IO(file.write(content.getBytes)).handleErrorWith(_ => IO.unit)
-
-  // Example usage
-  val concat: IO[Unit] =
-    (
-      for {
-        in1 <- openFile("file1")
-        in2 <- openFile("file2")
-        out <- openFile("file3")
-      } yield (in1, in2, out)
-      ).use { case (file1, file2, file3) =>
-      for {
-        content1 <- read(file1)
-        content2 <- read(file2)
-        _ <- write(new FileOutputStream("result.txt"), content1.content + content2.content)
-      } yield ()
-    }
-
-  implicit val runtime = cats.effect.unsafe.IORuntime.global
-  concat.unsafeRunSync()
-}
 
 
