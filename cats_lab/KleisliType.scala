@@ -3,6 +3,7 @@ package cats_labs
 import cats.data.Kleisli
 
 /**
+Kleisli is an effectful function compostion
  Kleisli enables composition of functions that return a monadic value
  Benefits:
  * Allows programming in a more composition like style.
