@@ -2,6 +2,9 @@ package cats_book
 
 import cats.Id
 import cats.data.WriterT
+import scala.concurrent._
+import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.duration._
 
 object WriterMonad extends App {
 
@@ -38,7 +41,7 @@ object WriterMonad extends App {
   println(r1)
   val r2: Id[Vector[String]] = writer.written // log from Writer
   println(r2)
-  val r3: (Vector[String], Int) = writer.run
+  val r3: Id[(Vector[String], Int)] = writer.run //both value and log from Writer
   println(r3)
 
 }
@@ -60,6 +63,7 @@ object WriterMonad2 extends App {
   val w4: Option[(List[String], Int)] = w1.run
 
   val w = WriterT.liftF[Option, List[String], Int](Some(123))
+  println(w.tell(List("a", "b", "c")).tell(List("d", "e", "f")).run)
   println(w.tell(List("a", "b", "c")).tell(List("d", "e", "f")).written)
 
 }
@@ -78,6 +82,10 @@ object WriterMonad3 extends App {
         x + y
       }
     }
+  }
+
+  val wx = (12).writer(Vector("a", "b").tell).flatMap { x =>
+    (x + 2).writer(Vector("c", "d").tell)
   }
 
   val w2 = for {
@@ -100,9 +108,10 @@ object WriterMonad3 extends App {
   println(w3)
 
   val w4 = w1.bimap(
-     log => log.map(_ + "%"),
+    log => log.map(_ + "%"),
     res => res * 100
   )
+
   val w5 = w1.mapBoth { (log, res) =>
     val l = log.map(_ + "!")
     val r = res * 100
@@ -115,4 +124,69 @@ object WriterMonad3 extends App {
   println("$$$$$$$$")
   println(w5.reset)
   println(w5.swap)
+}
+
+object WriterMonadExercise1 extends App {
+
+  def slowly[A](body: => A) = try body finally Thread.sleep(100)
+
+  def factorial(n: Int): Int = {
+    val ans = slowly(if (n == 0) 1 else n * factorial(n - 1))
+    println(s"fact $n $ans")
+    ans
+  }
+
+  //factorial(5)
+
+
+  val fS = Future.sequence(
+    Vector(
+      Future(factorial(5)),
+      Future(factorial(5))
+    )
+  )
+
+  Await.result(fS, 5.seconds)
+
+}
+
+object FixInterleavedMessages extends App {
+
+  import cats.data.Writer
+  import cats.syntax.applicative._
+  import cats.syntax.writer._
+
+  type Logged[A] = Writer[Vector[String], A]
+
+  def slowly[A](body: => A) = try body finally Thread.sleep(100)
+
+  def ff(n: Int): Logged[Int] = {
+    for {
+      ans <- if (n == 0) {
+        1.pure[Logged]
+      } else {
+        slowly(ff(n - 1).map(_ * n))
+      }
+      _ <- Vector(s"fact $n $ans").tell
+    } yield ans
+  }
+
+  def factorial(n: Int): Logged[Int] = {
+    if (n == 0) 1.writer(Vector(s"fact $n 1"))
+    else slowly(factorial(n - 1).flatMap { ans =>
+     (ans * n).writer(Vector(s"fact $n ${ans * n}"))
+    })
+  }
+
+  /*val fS = Future.sequence(
+    Vector(
+      Future(factorial2(5))
+    )
+  )
+
+  val x: Vector[Logged[Int]] = Await.result(fS, 5.seconds)
+  println(x)
+  println(x.map(_.written))*/
+
+  println(factorial(5).run)
 }
