@@ -178,15 +178,15 @@ object FixInterleavedMessages extends App {
     })
   }
 
-  /*val fS = Future.sequence(
+  //running several factorial in Parallel
+  val fS = Future.sequence(
     Vector(
-      Future(factorial2(5))
+      Future(factorial(5)),
+      Future(factorial(5)),
     )
   )
 
   val x: Vector[Logged[Int]] = Await.result(fS, 5.seconds)
-  println(x)
-  println(x.map(_.written))*/
+  println(x.map(_.written))
 
-  println(factorial(5).run)
 }
