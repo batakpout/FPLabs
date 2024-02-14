@@ -178,7 +178,8 @@ object FixInterleavedMessages extends App {
     })
   }
 
-  //running several factorial in Parallel
+  //running several factorial in Parallel, capturing their logs independently
+  // without fear of interleaving.
   val fS = Future.sequence(
     Vector(
       Future(factorial(5)),
