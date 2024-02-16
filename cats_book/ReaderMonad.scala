@@ -1,7 +1,6 @@
 package cats_book
 
 import cats.Id
-import cats.data.Kleisli
 
 object ReaderMonad1 extends App {
 
@@ -9,7 +8,7 @@ object ReaderMonad1 extends App {
 
   import cats.data.Reader
 
-  val catName: Reader[Cat, String] = Reader.apply(cat => cat.name)
+  val catName: Reader[Cat, String] = Reader(cat => cat.name)
 
   val f1: Cat => Id[String] = catName.run
   val r1 = f1(Cat("Garfield", "lasagne"))
@@ -40,6 +39,53 @@ object ReaderMonad1 extends App {
   } yield s"$greet . $feed"
 
   val r4: Id[String] = greetAndFeed1(Cat("Garfield", "lasagne"))
+}
 
+object ReaderMonadExercise extends App {
+  final case class Db(
+                       usernames: Map[Int, String],
+                       passwords: Map[String, String]
+                     )
+
+  import cats.data.Reader
+
+  type DbReader[A] = Reader[Db, A]
+
+  def findUsername(userId: Int): DbReader[Option[String]] =
+    Reader(db => db.usernames.get(userId))
+
+  def checkPassword(username: String, password: String): DbReader[Boolean] =
+    Reader(db => db.passwords.get(username).contains(password))
+
+
+  import cats.syntax.applicative._
+
+  def checkLogin(userId: Int, password: String): DbReader[Boolean] = {
+    for {
+      uNOpt <- findUsername(userId)
+      result <- uNOpt match {
+        case Some(u) => checkPassword(u, password)
+        case None => false.pure[DbReader]
+      }
+    } yield result
+  }
+
+  val users = Map(
+    1 -> "john",
+    2 -> "kate",
+    3 -> "margo"
+  )
+  val passwords = Map(
+    "john" -> "zerocool",
+    "kate" -> "acidburn",
+    "margo" -> "secret"
+  )
+
+  val db = Db(users, passwords)
+
+  println {
+    checkLogin(1, "zerocool").run(db)
+  }
 
 }
+
