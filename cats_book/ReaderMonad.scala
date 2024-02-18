@@ -1,8 +1,9 @@
+//> using dep "org.typelevel::cats-core:2.7.0"
 package cats_book
 
 import cats.Id
 
-object ReaderMonad1 extends App {
+object ReaderMonad1 {
 
   final case class Cat(name: String, favoriteFood: String)
 
@@ -42,6 +43,7 @@ object ReaderMonad1 extends App {
 }
 
 object ReaderMonadExercise extends App {
+
   final case class Db(
                        usernames: Map[Int, String],
                        passwords: Map[String, String]
@@ -85,6 +87,9 @@ object ReaderMonadExercise extends App {
 
   println {
     checkLogin(1, "zerocool").run(db)
+  }
+  println {
+    checkLogin(1, "hero").run(db)
   }
 
 }
