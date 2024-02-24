@@ -58,4 +58,65 @@ object State2 extends App {
 
   val (state, result) = both1.run(20).value
   println(s"state and result: ($state, $result)")
+  // as we saw state got threaded from one step to another even though we don't interact with it in the for-comp
+}
+
+object State3 extends App {
+  /**
+    Cats provide several convenience constructor methods for creating primitive steps:
+   */
+
+  val getDemo: State[Int, Int] = State.get[Int] // get extract the same state and result
+  val r1 = getDemo.run(10).value
+  println(r1)
+
+  val setDemo: State[Int, Unit] = State.set[Int](20) // sets state and returns Unit as result
+
+  val r2 = setDemo.run(10).value
+  println(r2)
+
+  val pureDemo: State[Int, String] = State.pure[Int, String]("Result") // pure ignore state and returns supplied result
+  val r3 = pureDemo.run(10).value
+  println(r3)
+
+  val inspectDemo: State[Int, String] = State.inspect[Int, String](x => s"$x!") // passes state thr a transformation f
+  val r4 = inspectDemo.run(10).value
+  println(r4)
+
+  val modifyDemo = State.modify[Int](_ + 1) // modify updates state using an update function
+  val r5 = modifyDemo.run(10).value
+  println(r5)
+  println("----")
+
+  //assemble these building blocks using a for-comp
+
+  import State._
+
+  val program1: State[Int, (Int, Int, Int)] = get[Int]
+    .flatMap { a =>
+      set[Int](a + 1)
+        .flatMap { _ =>
+          get[Int]
+            .flatMap { b =>
+              modify[Int](_ + 1)
+                .flatMap { _ =>
+                  inspect[Int, Int](_ * 1000)
+                    .map { c =>
+                      (a, b, c)
+                    }
+                }
+            }
+        }
+    }
+
+  println(program1.run(1).value)
+
+  val program2 = for {
+    a <- get[Int]
+    _ <- set[Int](a + 1)
+    b <- get[Int]
+    _ <- modify[Int](_ + 1)
+    c <- inspect[Int, Int](_ * 1000)
+  } yield (a, b, c)
+  println(program2.run(1).value)
 }
