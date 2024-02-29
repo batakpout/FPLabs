@@ -7,7 +7,10 @@ import cats.Id
    - one common use of RM is DI (dependency-injection)
    - if we have bunch of ops that depends on external conf. we can chain them using Reader to produce
      one large ops that accepts that conf. as parameter and runs our program in specified order.
-   - Reader is implemented in terms of Kleisli
+   - Reader is implemented in terms of Kleisli.
+   - Reader is useful when r constructing a program that can easily be represented by a function.
+   - Reader is useful in situations when we need to defer the injection of a known parameter.
+   - Reader is useful when we want to test parts of the program in isolation.
  */
 object ReaderMonad1 extends App {
   final case class Cat(name: String, favoriteFood: String)
