@@ -1,11 +1,10 @@
 package cats.monads
 
 /**
- * . An instance of State is a function that does two things:
- * 1. transform an input state to output state
- * 2. computes a result
- * . instances of State represent f's of type S => (S, A);   State and Result
- * .
+  - An instance of State is a function that does two things:
+  1. transform an input state to output state
+  2. computes a result
+  -instances of State represent f"s of type S => (S, A);   State and Result
  */
 
 import cats.Eval
@@ -28,11 +27,11 @@ object State1 extends App {
 }
 
 /**
-  . like Reader, Writer, power of State monad comes from combining instances
-  . map and flatMap threads state from one instance to another
-  . each individual instance represents an atomic state transformation, and their combinations
+  - like Reader, Writer, power of State monad comes from combining instances
+  - map and flatMap threads state from one instance to another
+  - each individual instance represents an atomic state transformation, and their combinations
     represents a complete sequence of changes
-  . This threading of state through the computations is what allows us to model stateful computations in a
+  - This threading of state through the computations is what allows us to model stateful computations in a
     functional and composable way using the State monad or in this way we can model mutable state in a pure
     functional way, without using actual mutation.
  */
@@ -40,17 +39,17 @@ object State1 extends App {
 
 object State2 extends App {
 
- val step1 = State[Int, String] { num =>
-   val ans = num + 1
-   (ans, s"Result of step1: $ans")
- }
+  val step1 = State[Int, String] { num =>
+    val ans = num + 1
+    (ans, s"Result of step1: $ans")
+  }
 
   val step2 = State[Int, String] { num =>
     val ans = num * 2
     (ans, s"Result of step1: $ans")
   }
 
-  val both1: IndexedStateT[Eval, Int, Int, (String, String)] = step1.flatMap { a => step2.map{ b => (a, b)}}
+  val both1: IndexedStateT[Eval, Int, Int, (String, String)] = step1.flatMap { a => step2.map { b => (a, b) } }
   val both2: State[Int, (String, String)] = for {
     a <- step1
     b <- step2
@@ -58,12 +57,12 @@ object State2 extends App {
 
   val (state, result) = both1.run(20).value
   println(s"state and result: ($state, $result)")
-  // as we saw state got threaded from one step to another even though we don't interact with it in the for-comp
+  // as we saw state got threaded from one step to another even though we don"t interact with it in the for-comp
 }
 
 object State3 extends App {
   /**
-    Cats provide several convenience constructor methods for creating primitive steps:
+   * Cats provide several convenience constructor methods for creating primitive steps:
    */
 
   val getDemo: State[Int, Int] = State.get[Int] // get extract the same state and result
@@ -88,7 +87,7 @@ object State3 extends App {
   println(r5)
   println("----")
 
-  //assemble these building blocks using a for-comp
+  /** assemble these building blocks using a for-comp* */
 
   import State._
 
@@ -120,3 +119,70 @@ object State3 extends App {
   } yield (a, b, c)
   println(program2.run(1).value)
 }
+
+object PostOrder_Integer_Arithmetic_Expr_Calc extends App {
+
+  import cats.data.State
+
+  type CalcState[A] = State[List[Int], A]
+
+  def evalOne(sym: String): CalcState[Int] = sym match {
+      case "+" => operator(_ + _)
+      case "-" => operator(_ - _)
+      case "*" => operator(_ * _)
+      case "/" => operator(_ / _)
+      case num => operand(num.toInt)
+    }
+
+    def operand(num: Int): CalcState[Int] = {
+      State { s =>
+        (num :: s, num)
+      }
+    }
+
+    def operator(f: (Int, Int) => Int): CalcState[Int] = {
+      State {
+        case h :: n :: tail =>
+          val ans = f(h, n)
+          (ans :: tail, ans)
+      }
+    }
+
+  val res: CalcState[Int] = evalOne("1").flatMap{ _ => evalOne("2").flatMap { _ => evalOne("+").map {identity}}}
+
+  val program: IndexedStateT[Eval, List[Int], List[Int], Int] = for {
+    _<- evalOne("1")
+    _<- evalOne("2")
+    ans <- evalOne("+")
+  } yield ans
+
+ // println(program.run(Nil).value)
+ // println(res.run(Nil).value)
+
+  def evalAll(input: List[String]): CalcState[Int] = {
+    def rec(l: List[String]): CalcState[Int] = {
+      if(l.isEmpty) State(s => (s, 0))
+      else evalOne(l.head).flatMap( _ => evalAll(l.tail))
+    }
+    rec(input)
+  }
+
+  //todo: why is it failing
+  import cats.syntax.applicative._
+
+
+  def usingFoldLeft(input: List[String]): CalcState[Int] = {
+    input.foldLeft(0.pure[CalcState]) { (a, sym) =>
+      a.flatMap(_ => evalOne(sym))
+    }
+  }
+
+  println("evalAll " + evalAll(List("1", "2", "+", "3", "*")).run(Nil).value)
+  println("usingFoldLeft " + usingFoldLeft(List("1", "2", "+", "3", "*")).run(Nil).value)
+
+  def evalInput(input: String) =
+    evalAll(input.split(" ").toList).run(Nil).value
+
+  println(evalInput("1 2 + 3 4 + *"))
+}
+
